@@ -1,0 +1,58 @@
+services:
+  # 主应用服务（Streamlit + Agent）
+  app:
+    build: .
+    container_name: zhiSaoTong-app
+    ports:
+      - "8501:8501"
+    environment:
+      - OPEMAO_API_KEY=${OPEMAO_API_KEY}
+      - PYTHONPATH=/app
+    volumes:
+      - ./data:/app/data
+      - ./chroma_db:/app/chroma_db
+      - ./logs:/app/logs
+      - ./.uploads:/app/.uploads
+    restart: unless-stopped
+    networks:
+      - zhiSaoTong-network
+    depends_on:
+      - mcp-server
+
+  # MCP 服务器服务
+  mcp-server:
+    build: .
+    container_name: zhiSaoTong-mcp
+    command: python zs_mcp/start_robot_mcp_server.py
+    ports:
+      - "8001:8001"
+    environment:
+      - OPEMAO_API_KEY=${OPEMAO_API_KEY}
+      - PYTHONPATH=/app
+    volumes:
+      - ./data:/app/data
+      - ./chroma_db:/app/chroma_db
+      - ./logs:/app/logs
+    restart: unless-stopped
+    networks:
+      - zhiSaoTong-network
+
+  # 知识库构建服务（按需运行）
+  vector-store-builder:
+    build: .
+    container_name: zhiSaoTong-vector-builder
+    command: python rag/vector_store.py
+    environment:
+      - OPEMAO_API_KEY=${OPEMAO_API_KEY}
+      - PYTHONPATH=/app
+    volumes:
+      - ./data:/app/data
+      - ./chroma_db:/app/chroma_db
+    networks:
+      - zhiSaoTong-network
+    profiles:
+      - tools
+
+networks:
+  zhiSaoTong-network:
+    driver: bridge
