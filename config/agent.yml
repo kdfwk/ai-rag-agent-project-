@@ -1,1 +1,7 @@
 external_data_path: data/external/records.csv
+
+# LangGraph Agent 配置
+max_retries: 3
+max_iterations: 10
+memory_type: summary  # summary | vector | both
+enable_plan_execute: true

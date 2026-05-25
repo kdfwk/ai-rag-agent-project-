@@ -60,3 +60,14 @@ htmlcov/
 
 # mypy
 .mypy_cache/
+
+# Tools and uploads
+.tools/
+.uploads/
+
+# Temporary files
+*.tmp.*
+*.bak
+
+# Claude AI
+.claude/
